@@ -152,6 +152,9 @@ table(is.na(act$steps))
 </p>
 
 
+**Now we are going to impute the missing data using the mean value of the corresponding interval and if there are no values available zero is coded in place of NA.**
+
+
 
 ```r
 #function replace each missing value with the mean value of its 5-minute interval
