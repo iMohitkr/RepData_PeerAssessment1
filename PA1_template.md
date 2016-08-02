@@ -19,6 +19,20 @@ rm(f)
 #to read the dataset
 act<-read.csv("activity.csv")
 act$date<-as.Date(act$date,"%Y-%m-%d")
+
+#summary of data to get a overview
+summary(act)
+```
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
 ```
 
 <p>
@@ -29,7 +43,7 @@ Made the date column of the dataset of class "Date" in order to process it effic
 
 ```r
 #to calculate the total steps taken grouped by date
-total_perday<-act%>%group_by(date)%>%summarise(steps_taken=sum(steps,na.rm=TRUE))
+total_perday<-act%>%group_by(date)%>%summarise(steps_taken=sum(as.double(unlist(steps)),na.rm=TRUE))
 head(total_perday[,1:2])
 ```
 
@@ -37,7 +51,7 @@ head(total_perday[,1:2])
 ## Source: local data frame [6 x 2]
 ## 
 ##         date steps_taken
-##       <date>       <int>
+##       <date>       <dbl>
 ## 1 2012-10-01           0
 ## 2 2012-10-02         126
 ## 3 2012-10-03       11352
@@ -54,7 +68,7 @@ Here, shown output is the dataset containing the total steps per day.
 
 ```r
 #plot 1
-ggplot(total_perday,aes(x=date,fill="x"))+geom_histogram(aes(weight=steps_taken),binwidth = 0.4,show.legend = FALSE)+theme_minimal()+labs(x="Date",y="No. of total steps per day")+scale_fill_manual(values = "orange")
+ggplot(total_perday,aes(x=steps_taken,fill="x"))+geom_histogram(show.legend = FALSE)+theme_minimal()+labs(x="Number of steps",y="Frequency")+scale_fill_manual(values = "orange")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
@@ -158,10 +172,10 @@ imputed$steps <- mapply(fill, imputed$steps, imputed$interval)
 imputed<-as.data.frame(imputed)
 
 #to calculate total steps per day in imputed dataset
-total_perday2<-imputed%>%group_by(date)%>%summarise(steps_taken=sum(as.double(as.character(steps)),na.rm=TRUE))
+total_perday2<-imputed%>%group_by(date)%>%summarise(steps_taken=sum(as.double(unlist(steps)),na.rm=TRUE))
 
 #plot 3
-ggplot(total_perday2,aes(x=date,fill="x"))+geom_histogram(aes(weight=steps_taken),binwidth = 0.4,show.legend = FALSE)+theme_minimal()+labs(x="Date",y="No. of total steps per day")+scale_fill_manual(values = "orange")
+ggplot(total_perday2,aes(x=steps_taken,fill="x"))+geom_histogram(show.legend = FALSE)+theme_minimal()+labs(x="No. of steps",y="Frequency")+scale_fill_manual(values = "orange")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
@@ -268,5 +282,7 @@ ggplot(avg_steps, aes(interval, average,color="x")) + geom_line(show.legend = FA
 
 <p>
 Both the trends for weekdays and weekends show simmilar peaks around same interval but on average more steps are recorded during weekends for higher intervals while the highest maximum average is recorded during weekdays.
+During the weekdays, morning activities start earlier than the weekends, and there is a clear peak in the mornings, but less activity in the afternoons.
+In weekends, morning activities are much less than weekdays, but there are more steady activities last for a whole day.
 
 </p>

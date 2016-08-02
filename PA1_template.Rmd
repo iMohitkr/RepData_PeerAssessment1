@@ -24,7 +24,8 @@ rm(f)
 act<-read.csv("activity.csv")
 act$date<-as.Date(act$date,"%Y-%m-%d")
 
-
+#summary of data to get a overview
+summary(act)
 
 ```
 
@@ -35,7 +36,7 @@ Made the date column of the dataset of class "Date" in order to process it effic
 ## What is mean total number of steps taken per day?
 ```{r}
 #to calculate the total steps taken grouped by date
-total_perday<-act%>%group_by(date)%>%summarise(steps_taken=sum(steps,na.rm=TRUE))
+total_perday<-act%>%group_by(date)%>%summarise(steps_taken=sum(as.double(unlist(steps)),na.rm=TRUE))
 head(total_perday[,1:2])
 ```
 
@@ -44,9 +45,9 @@ Here, shown output is the dataset containing the total steps per day.
 </p>
 
 
-```{r}
+```{r message=FALSE}
 #plot 1
-ggplot(total_perday,aes(x=date,fill="x"))+geom_histogram(aes(weight=steps_taken),binwidth = 0.4,show.legend = FALSE)+theme_minimal()+labs(x="Date",y="No. of total steps per day")+scale_fill_manual(values = "orange")
+ggplot(total_perday,aes(x=steps_taken,fill="x"))+geom_histogram(show.legend = FALSE)+theme_minimal()+labs(x="Number of steps",y="Frequency")+scale_fill_manual(values = "orange")
 
 
 ```
@@ -110,7 +111,7 @@ table(is.na(act$steps))
 </p>
 
 
-```{r}
+```{r message=FALSE}
 
 
 #function replace each missing value with the mean value of its 5-minute interval
@@ -131,10 +132,10 @@ imputed$steps <- mapply(fill, imputed$steps, imputed$interval)
 imputed<-as.data.frame(imputed)
 
 #to calculate total steps per day in imputed dataset
-total_perday2<-imputed%>%group_by(date)%>%summarise(steps_taken=sum(as.double(as.character(steps)),na.rm=TRUE))
+total_perday2<-imputed%>%group_by(date)%>%summarise(steps_taken=sum(as.double(unlist(steps)),na.rm=TRUE))
 
 #plot 3
-ggplot(total_perday2,aes(x=date,fill="x"))+geom_histogram(aes(weight=steps_taken),binwidth = 0.4,show.legend = FALSE)+theme_minimal()+labs(x="Date",y="No. of total steps per day")+scale_fill_manual(values = "orange")
+ggplot(total_perday2,aes(x=steps_taken,fill="x"))+geom_histogram(show.legend = FALSE)+theme_minimal()+labs(x="No. of steps",y="Frequency")+scale_fill_manual(values = "orange")
 
 ```
 
@@ -218,5 +219,7 @@ ggplot(avg_steps, aes(interval, average,color="x")) + geom_line(show.legend = FA
 
 <p>
 Both the trends for weekdays and weekends show simmilar peaks around same interval but on average more steps are recorded during weekends for higher intervals while the highest maximum average is recorded during weekdays.
+During the weekdays, morning activities start earlier than the weekends, and there is a clear peak in the mornings, but less activity in the afternoons.
+In weekends, morning activities are much less than weekdays, but there are more steady activities last for a whole day.
 
 </p>
