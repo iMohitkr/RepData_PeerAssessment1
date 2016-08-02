@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r message=FALSE}
+
+```r
 #required packages 
 library(dplyr)
 library(ggplot2)
@@ -23,9 +19,6 @@ rm(f)
 #to read the dataset
 act<-read.csv("activity.csv")
 act$date<-as.Date(act$date,"%Y-%m-%d")
-
-
-
 ```
 
 <p>
@@ -33,10 +26,24 @@ Made the date column of the dataset of class "Date" in order to process it effic
 </p>
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 #to calculate the total steps taken grouped by date
 total_perday<-act%>%group_by(date)%>%summarise(steps_taken=sum(steps,na.rm=TRUE))
 head(total_perday[,1:2])
+```
+
+```
+## Source: local data frame [6 x 2]
+## 
+##         date steps_taken
+##       <date>       <int>
+## 1 2012-10-01           0
+## 2 2012-10-02         126
+## 3 2012-10-03       11352
+## 4 2012-10-04       12116
+## 5 2012-10-05       13294
+## 6 2012-10-06       15420
 ```
 
 <p>
@@ -44,19 +51,26 @@ Here, shown output is the dataset containing the total steps per day.
 </p>
 
 
-```{r}
+
+```r
 #plot 1
 ggplot(total_perday,aes(x=date,fill="x"))+geom_histogram(aes(weight=steps_taken),binwidth = 0.4,show.legend = FALSE)+theme_minimal()+labs(x="Date",y="No. of total steps per day")+scale_fill_manual(values = "orange")
-
-
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
-```{r}
+
+
+```r
 #to calculate the mean and median of the total steps taken per day
 x<-c(mean(total_perday$steps_taken),median(total_perday$steps_taken))
 names(x)<-c("mean","median")
 x
+```
+
+```
+##     mean   median 
+##  9354.23 10395.00
 ```
 
 <p>
@@ -67,16 +81,17 @@ We can see that the <b>mean</b> of the dataset and <b>median</b> of the dataset 
 
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 #to calculate the average steps grouped by interval
 avg_steps<-act%>%group_by(interval)%>%summarise(average=mean(steps,na.rm=TRUE))
 avg_steps<-as.data.frame(avg_steps)
 
 #plot 2
 with(avg_steps,plot(interval,average,type = "l",col="dark green",xlab = "Interval",ylab="Average no of steps taken",main="Time series plot of daily activity pattern"))
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 <p>
 
@@ -85,9 +100,15 @@ In this plot we can observe positive-negative trends and the peak value is aroun
 
 </p>
 
-```{r}
+
+```r
 #to find the interval of the maximum average steps
 avg_steps[which.max(avg_steps$average),]
+```
+
+```
+##     interval  average
+## 104      835 206.1698
 ```
 
 
@@ -99,9 +120,16 @@ Interval <b>835</b> is observed to contain the maximum number of average steps, 
 
 ## Imputing missing values
 
-```{r}
+
+```r
 #to see the demographics of missing data
 table(is.na(act$steps))
+```
+
+```
+## 
+## FALSE  TRUE 
+## 15264  2304
 ```
 
 
@@ -110,9 +138,8 @@ table(is.na(act$steps))
 </p>
 
 
-```{r}
 
-
+```r
 #function replace each missing value with the mean value of its 5-minute interval
 fill <- function(steps, interval) {
     value <- NA
@@ -135,15 +162,22 @@ total_perday2<-imputed%>%group_by(date)%>%summarise(steps_taken=sum(as.double(as
 
 #plot 3
 ggplot(total_perday2,aes(x=date,fill="x"))+geom_histogram(aes(weight=steps_taken),binwidth = 0.4,show.legend = FALSE)+theme_minimal()+labs(x="Date",y="No. of total steps per day")+scale_fill_manual(values = "orange")
-
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 
-```{r}
+
+
+```r
 #to calculate missing demographics after imputation
 table(is.na(imputed$steps))
+```
 
+```
+## 
+## FALSE 
+## 17568
 ```
 
 
@@ -152,11 +186,17 @@ After imputation no NA values are left.
 </p>
 
 
-```{r}
+
+```r
 #to calculate the mean and median of the imputed data
 x<-c(mean(total_perday2$steps_taken),median(total_perday2$steps_taken))
 names(x)<-c("mean","median")
 x
+```
+
+```
+##     mean   median 
+## 10766.19 10766.19
 ```
 
 
@@ -171,8 +211,8 @@ Both mean and median values are higher after imputing missing data. The reason i
 ## Are there differences in activity patterns between weekdays and weekends?
 
 
-```{r}
 
+```r
 #function to return factor variable with levels "weekday" and "weekend"
 getweekday <- function(date) {
     value <- weekdays(date)
@@ -193,7 +233,16 @@ getweekday <- function(date) {
 imputed<-as.data.frame(imputed%>%mutate(day=getweekday(date)))
 
 head(imputed)
+```
 
+```
+##       steps       date interval     day
+## 1 1.7169811 2012-10-01        0 weekday
+## 2 0.3396226 2012-10-01        5 weekday
+## 3 0.1320755 2012-10-01       10 weekday
+## 4 0.1509434 2012-10-01       15 weekday
+## 5 0.0754717 2012-10-01       20 weekday
+## 6 2.0943396 2012-10-01       25 weekday
 ```
 
 
@@ -203,7 +252,8 @@ We can observe that the imputed dataset now contains a new coloumn "day" ,the fa
 </p>
 
 
-```{r}
+
+```r
 ##to calculate the average steps grouped by interval
 avg_steps<-imputed%>%group_by(day,interval)%>%summarise(average=mean(steps,na.rm=TRUE))
 avg_steps<-as.data.frame(avg_steps)
@@ -211,9 +261,9 @@ avg_steps<-as.data.frame(avg_steps)
 #plot 4
 ggplot(avg_steps, aes(interval, average,color="x")) + geom_line(show.legend = FALSE) + facet_grid(day~. ) + 
     xlab("Interval") + ylab("Number of steps")+theme_minimal()+scale_color_manual(values = "dark green")
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 
 <p>
